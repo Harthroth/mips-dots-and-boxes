@@ -38,6 +38,8 @@ For example: 01 is in a line but not scored, 00 is not in a line and has not bee
 If they are both already 01 or 11 then ask for a different coordinate. Just one having a 01 or 11 is okay.
 
 Then the system will run a check along the entire 2D array so see if there is a new box
-Proposed Solution: Nested for loop from i: 1-5, j: 1-7, sum the values of (i,j), (i,j+1), (i+1, j+1), (i+1, j) to a 4 bit number
-                   Then check if it is less than 12, if so then change all the values to 11 and score a point to whoever's turn it is.
+Proposed Solution: Nested for loop from i: 1-5, j: 1-7, sum the values of (i,j), (i,j+1), (i+1, j+1), (i+1, j) to a 
+                   4 bit number
+                   Then check if it is less than 12, if so then change all the values to 11 and score a point to whoever's 
+                   turn it is.
                    If not then the program will not add anything and move on
