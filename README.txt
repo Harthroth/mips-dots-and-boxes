@@ -31,5 +31,15 @@ With Lines
    |   |   |   |   |   |   |   |
 6  +---+---+---+---+---+---+---+
 
-The user will input two sets of x,y coordinates like "4 5 4 6" and if that line has not already been drawn it will be added.
+The user will input two sets of x,y coordinates like "4 5" and a cardinal direction and if that line has not already been drawn it will be added.
 
+Lines will be stored in two sets of arrays, one for horizontal lines and one for vertical lines.
+
+# Organization
+   Main: Used for getting inputs and outputs
+   
+   Line adding: Used for adding specific 
+   
+   Scoring: Keeps track of turn order and checks / updates score
+   
+   
