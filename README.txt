@@ -40,6 +40,8 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
    
    Line adding: Used for adding specific 
    
+   Box Counter: counts the number of boxes in the grid
+   
    Scoring: Keeps track of turn order and checks / updates score
    
    
