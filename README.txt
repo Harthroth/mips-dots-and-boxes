@@ -66,6 +66,7 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
                   box[i*7 + j] = turnNumber
                j = j + 1
             i = i + 1
+            j = 0
                   
    Scoring: Keeps track of turn order and checks / updates score
       Pseudocode:
