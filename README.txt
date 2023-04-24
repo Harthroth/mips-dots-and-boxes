@@ -53,6 +53,18 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
                   
    Main: Used for getting inputs and organizing
       Pseudocode:
+      player = 1
+      lines = 0
+      loop:
+      print game screen
+      get int input x
+      get int input y
+      get dir input N/S/E/W, replace with int 1/2/3/4
+      call add line x, y, dir, player
+      lines = lines + 1
+      player = 3 - player
+      bne lines, 7*6 + 8*5, loop
+      print end screen
       
    Line adding: Used for adding specific 
       Pseudocode:
@@ -84,17 +96,25 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
                      
    Box Counter: counts the number of boxes in the grid
       Pseudocode:
-         integer i = 0
-         integer j = 0
+         int i = 0
+         int j = 0
+         get score
          while i < 5
             while j < 7
                if horiArr[i*8 + j] == 1 and horiArr[(i+1)*8 + j] == 1 and vertArr[i*9 + j] == 1 and vertArr[i*9 + j + 1] == 1 and box[i*7 + j] == 0
                   box[i*7 + j] = turnNumber
+                  score[turnNumber] = score[turnNumber + 1]
                j = j + 1
             i = i + 1
             j = 0
                   
    Scoring: Keeps track of turn order and checks / updates score
-      Pseudocode:
+   Not needed, turn order in main, score update in add lines.
    
+   print end screen:
+   get score
+   slt score[1], score[2], check
+   print "player "
+   print check + 1
+   print " wins"
    
