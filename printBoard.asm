@@ -1,4 +1,27 @@
 .text
+	# print player 1 score
+	li $v0, 4
+	la $a0, player1
+	syscall
+	li $v0, 1
+	la $t0, score
+	la $a0, 1($t0)
+	syscall
+	
+	# print player 2 score
+	li $v0, 4
+	la $a0, player2
+	syscall
+	li $v0, 1
+	la $t0, score
+	la $a0, 2($t0)
+	syscall
+	
+	# print newline
+	li $v0, 11
+	li $a0, 10  
+	syscall
+	
 	move $t0, $zero	# set t0 to zero to start indexing the arrays, t0 is row index
 	move $t1, $zero # set t1 to zero, t1 is column index
 	
@@ -89,10 +112,13 @@ vertLoopEnd: move $t1, $zero	# reset the column counter
 	horizontalLineArray: .space 42	# 42 bytes for a 7 * 6 array
 	verticalLineArray: .space 40	# 40 bytes for an 8 * 5 array
 	boxArray: .space 35             # 35 bytes for a 7 * 5 array
+	score: .space 2                 # 2 bytes for the scores of both players
 	
 	dotSymbol: .byte '+'		# plus sign for representing dots
 	dashSymbol: .byte '-'	# subtract symbol for horizontal lines
 	verticalLineSymbol: .byte '|'	# vertical line symbol
 	spaceCharacter: .byte ' '
 	newLineCharacter: .byte '\n'
+	player1: .asciiz "\nPlayer 1 score: "
+	player2: .asciiz "\nPlayer 2 score: "
 	
