@@ -60,8 +60,17 @@ printSpace: lbu $a0, spaceCharacter	# else block: print a space character in pla
 continue2:
 	lbu $a0, spaceCharacter # print 3 space characters to fill in empty cell
 	syscall
+	sll $t2, $t0, 3
+	sub $t2, $t2, $t0  # multiply t0 by 7 by multiplying by 8 and subtracting 1
+	add $t2, $t2, $t1  # add t1 to t2 to get final index
+	lbu $t3, boxArray($t2)  # load the state of current box into register t3
+	beq $t3, 0, Else   # check if box has been captured
+	addi $a0, $t3, 48  # print out player that captured box
 	syscall
-	syscall
+	lbu $a0, spaceCharacter  # change back to space for last space
+	j End
+	Else: syscall
+	End: syscall
 	
 	addi $t1, $t1, 1	# increment column loop counter
 	j verticalPrintLoop	# loop for the rest of the row
@@ -77,8 +86,9 @@ vertLoopEnd: move $t1, $zero	# reset the column counter
 	syscall
 	
 .data
-	horizontalLineArray: .space 42	# 42 bytes for a 7 by 6 array
-	verticalLineArray: .space 40	# 40 bytes for an 8 x 5 array
+	horizontalLineArray: .space 42	# 42 bytes for a 7 * 6 array
+	verticalLineArray: .space 40	# 40 bytes for an 8 * 5 array
+	boxArray: .space 35             # 35 bytes for a 7 * 5 array
 	
 	dotSymbol: .byte '+'		# plus sign for representing dots
 	dashSymbol: .byte '-'	# subtract symbol for horizontal lines
