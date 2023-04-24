@@ -1,4 +1,8 @@
+# allows to be used in main.asm
+.globl start
+
 .text
+start:
 	# print player 1 score
 	li $v0, 4
 	la $a0, player1
@@ -24,7 +28,7 @@
 	
 	move $t0, $zero	# set t0 to zero to start indexing the arrays, t0 is row index
 	move $t1, $zero # set t1 to zero, t1 is column index
-	
+
 horizontalPrintLoop:
 	beq $t1, 7, horizLoopEnd	# if t1 = 7, past last column so move to next row 
 	
@@ -55,7 +59,7 @@ continue1:
 	addi $t1, $t1, 1	# increment column counter t1
 	j horizontalPrintLoop	# repeat the loop for the rest of the row
 
-horizLoopEnd: move $t1, $zero	# reset column counter
+horizLoopEnd: move $t1, $zero	#   column counter
 	
 	lbu $a0, dotSymbol	# print the final dot symbol (+ sign)
 	syscall
@@ -105,8 +109,9 @@ vertLoopEnd: move $t1, $zero	# reset the column counter
 	syscall
 	bne $t0, 6, horizontalPrintLoop	# if row does not = 6, repeat the loop
 	
-	li $v0, 10	# exit program (temporary)
-	syscall
+	#li $v0, 10	# exit program (temporary) | commented out to make main.asm work -Justin
+	#syscall
+	jr $ra		# needed to put here in order to interact with main.asm -also Justin
 	
 .data
 	horizontalLineArray: .space 42	# 42 bytes for a 7 * 6 array
