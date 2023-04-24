@@ -46,7 +46,7 @@ turnPlayerDecider:
 	syscall
 	
 	slti $t0, $v0, 3 			# if input < 3 (aka, is 1 or 2), then $t0 is set to 1
-	bne $v0, $zero, invalidInput		# if input is 0, then it's an invalidInput
+	beq $v0, $zero, invalidInput		# if input is 0, then it's an invalidInput
 				
 	bne $t0, $zero, turnPlayerDeciderEnd	# input is 1 or 2 goes to turnPlayerDeciderEnd, which goes back to main
 	
@@ -60,9 +60,10 @@ turnPlayerDecider:
 turnPlayerDeciderEnd:
 	sw $v0, turn1Player 			# stores input in turn1Player .word
 	
-	# spacing to make I/O readable
-	lbu $a0, newLineCharacter		# \- Can't figure out why this won't output a newLineCharacter
-	syscall					# / -Justin
+	# adds a newLinenCharacter to make I/O readable
+	li $v0, 11
+	lbu $a0, newLineCharacter		
+	syscall					
 	
 	jr $ra
 	
@@ -111,5 +112,5 @@ computerT1:
 	la $a0, ifP2
 	syscall
 		
-	j printInitialAsciizEnd 		# jumps to printInitialAsciizEnd
+	j printInitialAsciizEnd 	# jumps to printInitialAsciizEnd
 	
