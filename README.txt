@@ -71,25 +71,27 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
          get row coordinate = x
          get col coordinate = y
          get direction (NESW) = dir
-         if dir == 0 and x > 0 # North
+
+         if direction is South
+	y++
+	direction = North
+         else if direction is West
+	x++
+	direction = East
+
+         if x < 1 or x > 7 or y < 1 or y > 7
+	jump to inputError
+
+         if dir == 0 	# North
             if vertArr[(x-1)*8 + y] == 1
                jump to input error
             vertArr[(x-1)*8 + y] = 1
-         else if dir == 1 and y < 7 # East
+         else if dir == 1 	# East
             if horiArr[(x)*8 + y + 1] == 1
                jump to input error
             horiArr[(x)*8 + y + 1] = 1
-         else if dir == 2 and x < 5 # South
-            if vertArr[(x)*8 + y] == 1
-               jump to inputError
-            vertArr[(x)*8 + y] = 1
-         else if dir == 3 and y > 0 # West
-            if horiArr[(x)*8 + y] == 1
-               jump to inputError
-            horiArr[(x)*8 + y] = 1
-         else # if none go through the input is in error
-            jump to inputError
          jump to box counter file
+
          inputError: print error 
                      print newLine
                      jump to main
