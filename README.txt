@@ -98,15 +98,16 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
       Pseudocode:
          int i = 0
          int j = 0
-         get score
+         int retValue = 0
          while i < 5
             while j < 7
                if horiArr[i*8 + j] == 1 and horiArr[(i+1)*8 + j] == 1 and vertArr[i*9 + j] == 1 and vertArr[i*9 + j + 1] == 1 and box[i*7 + j] == 0
                   box[i*7 + j] = turnNumber
-                  score[turnNumber] = score[turnNumber + 1]
+                  retValue++
                j = j + 1
             i = i + 1
             j = 0
+         return retValue
                   
    Scoring: Keeps track of turn order and checks / updates score
    Not needed, turn order in main, score update in add lines.
