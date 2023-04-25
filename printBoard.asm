@@ -113,12 +113,7 @@ vertLoopEnd: move $t1, $zero	# reset the column counter
 	#syscall
 	jr $ra		# needed to put here in order to interact with main.asm -also Justin
 	
-.data
-	horizontalLineArray: .space 42	# 42 bytes for a 7 * 6 array
-	verticalLineArray: .space 40	# 40 bytes for an 8 * 5 array
-	boxArray: .space 35             # 35 bytes for a 7 * 5 array
-	score: .space 2                 # 2 bytes for the scores of both players
-	
+.data	
 	dotSymbol: .byte '+'		# plus sign for representing dots
 	dashSymbol: .byte '-'	# subtract symbol for horizontal lines
 	verticalLineSymbol: .byte '|'	# vertical line symbol
