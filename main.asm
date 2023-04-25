@@ -5,10 +5,13 @@
 	initialText1:	.asciiz "Player "
 	initialText2:	.asciiz " will be going first"
 	ifP2:		.asciiz	" (Computer)"
+	
+	player1TurnPrompt:	.asciiz ""
 
 	newLineCharacter: .byte '\n'
 
-	turn1Player:	.word 0
+	firstTurnPlayer:	.word 0
+	currentTurnPlayer:	.word 0
 
 
 .globl main
@@ -16,11 +19,10 @@
 .text
 main:
 	jal turnPlayerDecider
-	j printBoard	# Unable to use jal because I have to use jal to call function from another class
-			# plz look over code if it's how we're supposed to actually use multiple.asm files -Justin
-	
-postBoardPrint:
+	jal printBoard	
 	jal printInitialAsciiz
+	#jal gameStart
+	
 	
 	li $v0, 10
 	syscall
@@ -58,7 +60,7 @@ turnPlayerDecider:
 
 
 turnPlayerDeciderEnd:
-	sw $v0, turn1Player 			# stores input in turn1Player .word
+	sw $v0, firstTurnPlayer 			# stores input in firstTurnPlayer .word
 	
 	# adds a newLinenCharacter to make I/O readable
 	li $v0, 11
@@ -68,20 +70,22 @@ turnPlayerDeciderEnd:
 	jr $ra
 	
 	
-	
+#--------------------------------------------------------------------------------------------------------------------------
 # printBoard Function
 printBoard:
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+		
 	# prints the board from printBoard.asm
 	jal start
 	
-	# resetting counters for the registers
-	move $t0, $zero
-	move $t1, $zero
-
-	j postBoardPrint
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	jr $ra			# returns to main
 	
 	
-
+#--------------------------------------------------------------------------------------------------------------------------
 # initialAsciiz Function
 printInitialAsciiz:	
 	# outputs initialText1
@@ -91,20 +95,25 @@ printInitialAsciiz:
 	
 	# outputs who is turn 1 player
 	li $v0, 1
-	lw $a0, turn1Player
+	lw $a0, firstTurnPlayer
 	syscall
 	
 	# if computer is first turn player, then jump to computerT1
-	lw $t0, turn1Player
+	lw $t0, firstTurnPlayer
 	li $t1, 2
 	beq $a0, $t1, computerT1
 
 printInitialAsciizEnd:
+	# prints initialText2
 	li $v0, 4
 	la $a0, initialText2
 	syscall
 	
-	jr $ra
+	# loads firstTurnPlayer and sets it to the currentTurnPlayer
+	lw $t0, firstTurnPlayer		
+	sw $t0, currentTurnPlayer
+	
+	jr $ra	# returns to main
 
 computerT1:
 	# first turn player is Player2, so output ifP2
@@ -113,4 +122,18 @@ computerT1:
 	syscall
 		
 	j printInitialAsciizEnd 	# jumps to printInitialAsciizEnd
+	
+#--------------------------------------------------------------------------------------------------------------------------
+# gameStart Function
+gameStart:
+	# depending on value of currentTurnPlayer, it will go to player1Turn or player2Turn
+	lw $t0, currentTurnPlayer
+	beq $t0, 1, player1Turn
+	beq $t0, 2, player2Turn
+
+player1Turn:
+	
+	
+
+player2Turn:
 	
