@@ -118,3 +118,5 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
    print check + 1
    print " wins"
    
+   Opponent AI: pick random number 0-1, if 0 then horizontal array if 1 then vertical array
+                Then randomly select from the picked array.
