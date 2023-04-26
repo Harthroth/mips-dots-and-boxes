@@ -29,10 +29,10 @@ postDirUpdate:
 	beq $t2, 1, eastLineAdd
 	
 	# adding a north line
-	# t4 is index = (x-1)*8 + y
-	addi $t3, $t0, -1
+	# t3 is index = (y-1)*8 + x
+	addi $t3, $t1, -1
 	sll $t3, $t3, 3
-	add $t3, $t3, $t1
+	add $t3, $t3, $t0
 	lbu $t4, verticalLineArray($t3)
 	bne $t4, 0, lineExistsError	# if line exists, throw error
 	li $t4, 1
@@ -44,10 +44,9 @@ postDirUpdate:
 	
 eastLineAdd:
 	# adding an east line
-	# t4 is index = x*8 + y + 1
-	sll $t3, $t0, 3
-	add $t3, $t3, $t1
-	addi $t3, $t3, 1
+	# t3 is index = y*7 + x
+	mul $t3, $t1, 7
+	add $t3, $t3, $t0
 	lbu $t4, horizontalLineArray($t3)
 	bne $t4, 0, lineExistsError	# if line exists, throw error
 	li $t4, 1

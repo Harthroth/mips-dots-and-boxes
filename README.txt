@@ -83,13 +83,13 @@ Lines will be stored in two sets of arrays, one for horizontal lines and one for
 	jump to inputError
 
          if dir == 0 	# North
-            if vertArr[(x-1)*8 + y] == 1
+            if vertArr[(y-1)*8 + x] == 1
                jump to input error
-            vertArr[(x-1)*8 + y] = 1
+            vertArr[(y-1)*8 + x] = 1
          else if dir == 1 	# East
-            if horiArr[(x)*8 + y + 1] == 1
+            if horiArr[(y)*7 + x] == 1
                jump to input error
-            horiArr[(x)*8 + y + 1] = 1
+            horiArr[(y)*7 + x] = 1
          jump to box counter file
 
          inputError: print error 
