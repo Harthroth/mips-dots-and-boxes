@@ -3,16 +3,22 @@
 	invalidInput:	.asciiz "Invalid input, must be either input 1 or 2\n"
 
 	initialText1:	.asciiz "Player "
-	initialText2:	.asciiz " will be going first"
+	initialText2:	.asciiz " will be going first\n"
 	ifP2:		.asciiz	" (Computer)"
 	
-	player1TurnPrompt:	.asciiz ""
+	player1TurnPrompt1:	.asciiz "Input the X coordinate (0-7)\n"
+	player1TurnPrompt2:	.asciiz "\nInput the Y coordinate (0-5)\n"
+	player1TurnPrompt3:	.asciiz "\nInput the Cardinal Direction (N/S/E/W)\n"
+	
+	invalidPrompt:		.asciiz "Error in input, try again\n"
 
-	newLineCharacter: .byte '\n'
+	newLineCharacter: 	.byte '\n'
 
 	firstTurnPlayer:	.word 0
 	currentTurnPlayer:	.word 0
-
+	xCoord:			.word 0
+	yCoord:			.word 0
+	cardinalDirection:	.word 80
 
 .globl main
 
@@ -21,7 +27,8 @@ main:
 	jal turnPlayerDecider
 	jal printBoard	
 	jal printInitialAsciiz
-	#jal gameStart
+	
+	jal gameStart
 	
 	
 	li $v0, 10
@@ -132,8 +139,57 @@ gameStart:
 	beq $t0, 2, player2Turn
 
 player1Turn:
+	# prints player1TurnPrompt and stores each input in respective variable
+	li $v0, 4
+	la $a0, player1TurnPrompt1
+	syscall
+	
+	li $v0, 5
+	syscall
+	
+	bge $v0, 8, invalid	#checks if input is greater than 7 (invalid input), and if so, goes to invalid
+	blt $v0, 0, invalid	# checks if input is a negative (invalid input), and if so, goes to invalid
+	sw $v0, xCoord
+	
+	
+	li $v0, 4
+	la $a0, player1TurnPrompt2
+	syscall
+	
+	li $v0, 5
+	syscall
+	
+	bge $v0, 6, invalid	#checks if input is greater than 7, and if so, goes to invalid
+	blt $v0, 0, invalid	# checks if input is a negative (invalid input), and if so, goes to invalid
+	sw $v0, yCoord
+	
+	li $v0, 4
+	la $a0, player1TurnPrompt3
+	syscall
+	
+	li $v0, 8	
+	la $a0, cardinalDirection
+	li $a1, 20			# allocate byte space for string
+	move $t0, $a0
+	sw $t0, cardinalDirection	# store string into cardinalDirection
+	syscall
+	
+	jr $ra
+	
 	
 	
 
 player2Turn:
+
+
+
+
+
+
+
+invalid:
+	li $v0, 4
+	la $a0, invalidPrompt
+	syscall
+	j player1Turn
 	
