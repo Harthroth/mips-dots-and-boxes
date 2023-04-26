@@ -2,8 +2,10 @@
 # a0 holds x, a1 holds y, a2 holds direction
 # Subroutine does input validation and prints an error
 # v0 contains return value which is 0 if line is printed successfully otherwise it holds 1
+.globl lineAdding
 
 .text
+lineAdding:
 	move $t0, $a0 # a0 holds X coordinate, move to t0
 	move $t1, $a1 # a1 holds Y coordinate, move to t1
 	move $t2, $a2 # a2 holds direction num (NESW / 0123)
@@ -32,7 +34,7 @@ postDirUpdate:
 	sll $t3, $t3, 3
 	add $t3, $t3, $t1
 	lbu $t4, verticalLineArray($t3)
-	beq $t4, 0, lineExistsError	# if line exists, throw error
+	bne $t4, 0, lineExistsError	# if line exists, throw error
 	li $t4, 1
 	sb $t4, verticalLineArray($t3)
 	
@@ -47,7 +49,7 @@ eastLineAdd:
 	add $t3, $t3, $t1
 	addi $t3, $t3, 1
 	lbu $t4, horizontalLineArray($t3)
-	beq $t4, 0, lineExistsError	# if line exists, throw error
+	bne $t4, 0, lineExistsError	# if line exists, throw error
 	li $t4, 1
 	sb $t4, horizontalLineArray($t3)
 	
@@ -79,7 +81,11 @@ InputErrorPrint:
 	li $v0, 4
 	syscall
 	li $v0, 1
-	jr $ra
+	
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	j gameStart
+	
 	
 .data	
 	xTooSmallString: .asciiz "Inputted x value is too small!\n"

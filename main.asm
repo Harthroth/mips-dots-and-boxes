@@ -15,9 +15,20 @@
 	player1TurnPrompt2:	.asciiz "\nInput the Y coordinate (0-5)\n"
 	player1TurnPrompt3:	.asciiz "\nInput the Cardinal Direction (N/S/E/W)\n"
 	
+	turnPlayerPrompt1:	.asciiz "\nIt is now Player "
+	turnPlayerPrompt2:	.asciiz "'s "
+	turnPlayerPrompt2a:	.asciiz "(Computer) "
+	turnPlayerPrompt3:	.asciiz "turn\n"
+	
 	invalidPrompt:		.asciiz "Error in input, try again\n"
 
 	newLineCharacter: 	.byte '\n'
+	nChar: 	.byte 'N'
+	sChar:	.byte 'S'
+	eChar: 	.byte 'E'
+	wChar: 	.byte 'W'
+	
+	
 
 	firstTurnPlayer:	.word 0
 	currentTurnPlayer:	.word 0
@@ -30,12 +41,13 @@
 .globl verticalLineArray
 .globl boxArray
 .globl score
+.globl gameStart
 
 .text
 main:
 	jal turnPlayerDecider
 	jal printBoard	
-	jal printInitialAsciiz
+	jal printInitialAsciiz	# runs printInitialAsciiz method
 	
 	jal gameStart
 	
@@ -156,8 +168,6 @@ player1Turn:
 	li $v0, 5
 	syscall
 	
-	bge $v0, 8, invalid	#checks if input is greater than 7 (invalid input), and if so, goes to invalid
-	blt $v0, 0, invalid	# checks if input is a negative (invalid input), and if so, goes to invalid
 	sw $v0, xCoord
 	
 	
@@ -168,8 +178,6 @@ player1Turn:
 	li $v0, 5
 	syscall
 	
-	bge $v0, 6, invalid	#checks if input is greater than 7, and if so, goes to invalid
-	blt $v0, 0, invalid	# checks if input is a negative (invalid input), and if so, goes to invalid
 	sw $v0, yCoord
 	
 	li $v0, 4
@@ -183,22 +191,199 @@ player1Turn:
 	sw $t0, cardinalDirection	# store string into cardinalDirection
 	syscall
 	
-	jr $ra
+	# lineAdding jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	lw $a0, xCoord
+	lw $a1, yCoord
+	lw $a2, cardinalDirection
+	lw $a3, currentTurnPlayer
+	jal lineAdding
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	# printBoard jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	jal printBoard
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	lw $t0, currentTurnPlayer	# loads currentTurnPlayer
+	addi $t0, $t0, -1	
+	sw $t0, currentTurnPlayer	# sets currentTurnPlayer to P1
+	
+	# turnPlayerPrompt jal section
+	lw $t0, currentTurnPlayer	# loads currentTurnPlayer
+	addi $t0, $t0, 1
+	sw $t0, currentTurnPlayer	# sets currentTurnPlayer to P2
+	
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	jal turnPlayerPrompt
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	j gameStart
 	
 	
 	
 
 player2Turn:
-
-
-
-
-
-
-
-invalid:
-	li $v0, 4
-	la $a0, invalidPrompt
-	syscall
-	j player1Turn
+	# random number generator for 1st value
+	li $a1, 7  #Here you set $a1 to the max bound.
+   	li $v0, 42  #generates the random number.
+    	syscall
+    	
+    	#add $a0, $a0, 100  #Here you add the lowest bound
+   	li $v0, 1  #1 print integer
+  	syscall
+  	
+  	sw $a0, xCoord	# stores rng x-coord into xCoord
+  	
+  	# newLineChar
+  	lbu $a0, newLineCharacter
+  	li $v0, 11
+  	syscall
+  	
+  	# random number generator for 2nd value
+  	li $a1, 5  #Here you set $a1 to the max bound.
+   	li $v0, 42  #generates the random number.
+    	syscall
+    	
+    	# add $a0, $a0, 100  #Here you add the lowest bound
+   	li $v0, 1  #1 print integer
+  	syscall
+  	
+  	sw $a0, yCoord	# stores rng x-coord into xCoord
+  	
+  	# newlineChar
+    	lbu $a0, newLineCharacter
+  	li $v0, 11
+  	syscall
+  	
+  	# random number generator for 3rd value (N/S/E/W)
+  	li $a1, 3  #Here you set $a1 to the max bound.
+   	li $v0, 42  #generates the random number.
+    	syscall
+    	
+    	# depending on RNG, chooses N/S/E/W
+    	beq $a0, 0, N
+    	beq $a0, 1, S
+    	beq $a0, 2, E
+    	beq $a0, 3, W
+    	
+player2TurnEnd:
+	# stores cardinal direction in cardinalDirection
+	li $v0, 8	
+	la $a0, cardinalDirection
+	li $a1, 20			# allocate byte space for string
+	move $t0, $a0
+	sw $t0, cardinalDirection	# store string into cardinalDirection
 	
+	# newlineChar
+    	lbu $a0, newLineCharacter
+  	li $v0, 11
+  	syscall
+  	
+	
+	
+	# lineAdding jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	lw $a0, xCoord
+	lw $a1, yCoord
+	lw $a2, cardinalDirection
+	lw $a3, currentTurnPlayer
+	jal lineAdding
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	# printBoard jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	jal printBoard
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	lw $t0, currentTurnPlayer	# loads currentTurnPlayer
+	addi $t0, $t0, -1	
+	sw $t0, currentTurnPlayer	# sets currentTurnPlayer to P1
+	
+	# turnPlayerPrompt jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	jal turnPlayerPrompt
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+
+	j gameStart
+    	
+    	
+N:
+	lbu $a0, nChar
+  	li $v0, 11
+  	syscall
+  	j player2TurnEnd
+S:
+	lbu $a0, sChar
+  	li $v0, 11
+  	syscall
+  	j player2TurnEnd
+E:
+	lbu $a0, eChar
+  	li $v0, 11
+  	syscall
+  	j player2TurnEnd
+W:
+	lbu $a0, wChar
+  	li $v0, 11
+  	syscall
+  	j player2TurnEnd
+  	
+
+#--------------------------------------------------------------------------------------------------------------------------
+# turnPlayerPrompt Method
+turnPlayerPrompt:
+	li $v0, 4
+	la $a0, turnPlayerPrompt1
+	syscall
+	
+	li $v0, 1
+	lw $a0, currentTurnPlayer
+	syscall
+	
+	li $v0, 4
+	la $a0, turnPlayerPrompt2
+	syscall
+	
+	# if it's P2 turn, then jump to p2Prompt
+	li $t1, 2
+	beq $a0, $t1, p2Prompt
+	
+
+turnPlayerPromptEnd:
+	li $v0, 4
+	la $a0, turnPlayerPrompt3
+	syscall
+	
+	jr $ra	
+	
+p2Prompt:
+	li $v0, 4
+	la $a0, turnPlayerPrompt2a
+	syscall
+	
+	j turnPlayerPromptEnd

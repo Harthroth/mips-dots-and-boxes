@@ -1,7 +1,7 @@
 # Subroutine to count any new boxes created
 # The subroutine needs turnNumber as an argument in $a0 to mark completed boxes
 # It will return the number (0, 1, or 2) of newly created boxes by this player (turnNumber) in register $v0
-
+	
 .globl BoxCounter
 
 .text

@@ -1,5 +1,6 @@
 # allows to be used in main.asm
 .globl start
+.globl printBoard
 
 .text
 #--------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +31,7 @@ start:
 	move $t0, $zero	# set t0 to zero to start indexing the arrays, t0 is row index
 	move $t1, $zero # set t1 to zero, t1 is column index
 
+printBoard:
 horizontalPrintLoop:
 	beq $t1, 7, horizLoopEnd	# if t1 = 7, past last column so move to next row 
 	
