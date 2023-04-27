@@ -10,7 +10,7 @@ start:
 	syscall
 	li $v0, 1
 	la $t0, score
-	la $a0, 1($t0)
+	lbu $a0, 0($t0)
 	syscall
 	
 	# print player 2 score
@@ -19,7 +19,7 @@ start:
 	syscall
 	li $v0, 1
 	la $t0, score
-	la $a0, 2($t0)
+	lbu $a0, 1($t0)
 	syscall
 	
 	# print newline
@@ -27,7 +27,7 @@ start:
 	li $a0, 10  
 	syscall
 	
-	move $t0, $zero	# set t0 to zero as index
+	addi $t0, $zero, 1	# set t0 to 1 as index
 printColumnNums:
 	li $v0, 1
 	move $a0, $t0	# print out the number of the column
@@ -40,7 +40,7 @@ printColumnNums:
 	syscall
 	
 	addi $t0, $t0, 1
-	bne $t0, 9, printColumnNums	# loop for all columns
+	bne $t0, 10, printColumnNums	# loop for all columns
 	
 	lbu $a0, newLineCharacter	# print newline
 	syscall
@@ -87,7 +87,7 @@ horizLoopEnd: move $t1, $zero	#   column counter
 	syscall
 	syscall
 	li $v0, 1	# print 2 spaces and then row number
-	move $a0, $t0
+	addi $a0, $t0, 1	# set a0, to t0+1 to make it 1-based number, not 0-based
 	syscall
 	
 	li $v0, 11

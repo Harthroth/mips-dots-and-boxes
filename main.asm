@@ -11,9 +11,9 @@
 	initialText2:	.asciiz " will be going first\n"
 	ifP2:		.asciiz	" (Computer)"
 	
-	player1TurnPrompt1:	.asciiz "Input the X coordinate (0-8)\n"
-	player1TurnPrompt2:	.asciiz "\nInput the Y coordinate (0-6)\n"
-	player1TurnPrompt3:	.asciiz "\nInput the Cardinal Direction (N/S/E/W)\n"
+	player1TurnPrompt1:	.asciiz "Input the X coordinate (1-9)\n"
+	player1TurnPrompt2:	.asciiz "\nInput the Y coordinate (1-7)\n"
+	player1TurnPrompt3:	.asciiz "\nInput the Cardinal Direction in upper case (N/S/E/W)\n"
 	
 	turnPlayerPrompt1:	.asciiz "\nIt is now Player "
 	turnPlayerPrompt2:	.asciiz "'s "
@@ -21,6 +21,7 @@
 	turnPlayerPrompt3:	.asciiz "turn\n"
 	
 	invalidPrompt:		.asciiz "Error in input, try again\n"
+	invalidDirection:	.asciiz "Error in direction input (make sure to use upper case!), try again\n"
 	
 	boxes:			.asciiz "A box has been created, player goes again\n"
 	
@@ -86,7 +87,7 @@ turnPlayerDecider:
 turnPlayerDeciderEnd:
 	sw $v0, firstTurnPlayer 			# stores input in firstTurnPlayer .word
 	
-	# adds a newLinenCharacter to make I/O readable
+	# adds a newLineCharacter to make I/O readable
 	li $v0, 11
 	lbu $a0, newLineCharacter		
 	syscall					
@@ -163,6 +164,7 @@ player1Turn:
 	li $v0, 5
 	syscall
 	
+	addi $v0, $v0, -1 # decrement user input to be 0-based indexing
 	sw $v0, xCoord
 	
 	li $v0, 4
@@ -172,80 +174,62 @@ player1Turn:
 	li $v0, 5
 	syscall
 	
+	addi $v0, $v0, -1 # decrement user input to be 0-based indexing
 	sw $v0, yCoord
-	
+
+getDirection:	
 	li $v0, 4
 	la $a0, player1TurnPrompt3
 	syscall
 	
-	li $v0, 12
+	# li $v0, 12
+	# syscall
+	
+	li $v0, 8	# read string syscall
+	la $a0, cardinalDirection	# address to read into is cardinalDirection
+	li $a1, 4	# read at most 4 characters only
 	syscall
+	lbu $t0, 0($a0)
 	
 	# char to int
 	lbu $t1, nChar
 	lbu $t2, sChar
 	lbu $t3, eChar
 	lbu $t4, wChar
-	beq $v0, $t1, setNChar
-	beq $v0, $t2, setSChar
-	beq $v0, $t3, setEChar
-	beq $v0, $t4, setWChar
+	beq $t0, $t1, setNChar
+	beq $t0, $t2, setSChar
+	beq $t0, $t3, setEChar
+	beq $t0, $t4, setWChar
 	
-	# TODO: Add error here if input is not any of NESW
+	li $v0, 4
+	la $a0, invalidDirection
+	syscall
 	
-	j player1TurnEnd
+	j getDirection
 	
 setNChar:
-	#sb $t1, cardinalDirection 
-  	#lbu $a0, cardinalDirection	# making sure it works
-  	#li $v0, 11
   	# set $t1 to 0, and stores it in cardinal Direction
 	addi $t1, $zero, 0
   	sw $t1, cardinalDirection
-  	
-  	# making sure it works
-  	li $v0, 1
-  	lw $a0, cardinalDirection
-  	syscall
-  	
 	j player1TurnEnd
+	
 setEChar:
 	# set $t1 to 1, and stores it in cardinal Direction
 	addi $t1, $zero, 1
   	sw $t1, cardinalDirection
-  	
-  	# making sure it works
-  	li $v0, 1
-  	lw $a0, cardinalDirection
-  	syscall
-  	
 	j player1TurnEnd
 
 setSChar:
 	# set $t1 to 2, and stores it in cardinal Direction
 	addi $t1, $zero, 2
   	sw $t1, cardinalDirection
-  	
-  	# making sure it works
-  	li $v0, 1
-  	lw $a0, cardinalDirection
-  	syscall
-  	
 	j player1TurnEnd
 
 setWChar:
 	# set $t1 to 3, and stores it in cardinal Direction
 	addi $t1, $zero, 3
   	sw $t1, cardinalDirection
-  	
-  	# making sure it works
-  	li $v0, 1
-  	lw $a0, cardinalDirection
-  	syscall
-  	
 	j player1TurnEnd
-	
-	
 	
 	
 player1TurnEnd:
@@ -294,14 +278,15 @@ newTurn:
 
 player2Turn:
 	# random number generator for 1st value
-	li $a1, 7  #Here you set $a1 to the max bound.
+	li $a1, 9  #Here you set $a1 to the max bound.
    	li $v0, 42  #generates the random number.
     	syscall
     	
-    	#add $a0, $a0, 100  #Here you add the lowest bound
+    	add $a0, $a0, 1  #Here you add the lowest bound
    	li $v0, 1  #1 print integer
   	syscall
   	
+  	addi $a0, $a0, -1 # decrement random number to be 0-based indexing
   	sw $a0, xCoord	# stores rng x-coord into xCoord
   	
   	# newLineChar
@@ -310,14 +295,15 @@ player2Turn:
   	syscall
   	
   	# random number generator for 2nd value
-  	li $a1, 5  #Here you set $a1 to the max bound.
+  	li $a1, 7  #Here you set $a1 to the max bound.
    	li $v0, 42  #generates the random number.
     	syscall
     	
-    	# add $a0, $a0, 100  #Here you add the lowest bound
+    	add $a0, $a0, 1  #Here you add the lowest bound
    	li $v0, 1  #1 print integer
   	syscall
   	
+  	addi $a0, $a0, -1 # decrement random number to be 0-based indexing
   	sw $a0, yCoord	# stores rng x-coord into xCoord
   	
   	# newlineChar
@@ -325,24 +311,22 @@ player2Turn:
   	li $v0, 11
   	syscall
   	
-  	# random number generator for 3rd value (N/S/E/W)
+  	# random number generator for 3rd value (N/E/S/W)
   	li $a1, 3  #Here you set $a1 to the max bound.
    	li $v0, 42  #generates the random number.
     	syscall
     	
     	# depending on RNG, chooses N/E/S/W
-    	beq $a0, 0, N
-    	beq $a0, 1, E
-    	beq $a0, 2, S
-    	beq $a0, 3, W
+    	move $s0, $a0
+    	beq $s0, 0, N
+    	beq $s0, 1, E
+    	beq $s0, 2, S
+    	beq $s0, 3, W
     	
 player2TurnEnd:
 	# stores cardinal direction in cardinalDirection
-	li $v0, 8	
-	la $a0, cardinalDirection
-	li $a1, 20			# allocate byte space for string
-	move $t0, $a0
-	sw $t0, cardinalDirection	# store string into cardinalDirection
+	move $t0, $s0
+	sw $t0, cardinalDirection	# store direction into cardinalDirection
 	
 	# newlineChar
     	lbu $a0, newLineCharacter
