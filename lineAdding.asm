@@ -87,9 +87,9 @@ InputErrorPrint:
 	
 	
 .data	
-	xTooSmallString: .asciiz "Inputted x value is too small!\n"
-	xTooBigString: .asciiz "Inputted x value is too big!\n"
-	yTooSmallString: .asciiz "Inputted y value is too small!\n"
-	yTooBigString: .asciiz "Inputted y value is too big!\n"
-	lineExistsErrorString: .asciiz "Line already exists in that position!\n"
+	xTooSmallString: .asciiz "\nInputted x value is too small!\n"
+	xTooBigString: .asciiz "\nInputted x value is too big!\n"
+	yTooSmallString: .asciiz "\nInputted y value is too small!\n"
+	yTooBigString: .asciiz "\nInputted y value is too big!\n"
+	lineExistsErrorString: .asciiz "\nLine already exists in that position!\n"
 	

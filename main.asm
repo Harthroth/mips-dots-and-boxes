@@ -21,6 +21,10 @@
 	turnPlayerPrompt3:	.asciiz "turn\n"
 	
 	invalidPrompt:		.asciiz "Error in input, try again\n"
+	
+	boxes:			.asciiz "A box has been created, player goes again\n"
+	
+	turnNumber:		.word 0
 
 	newLineCharacter: 	.byte '\n'
 	nChar: 	.byte 'N'
@@ -34,7 +38,7 @@
 	currentTurnPlayer:	.word 0
 	xCoord:			.word 0
 	yCoord:			.word 0
-	cardinalDirection:	.word 80
+	cardinalDirection:	.word 0
 
 .globl main
 .globl horizontalLineArray
@@ -43,6 +47,7 @@
 .globl score
 .globl gameStart
 
+##--------------------------------------------------------------------------------------------------------------------------
 .text
 main:
 	jal turnPlayerDecider
@@ -54,15 +59,6 @@ main:
 	
 	li $v0, 10
 	syscall
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 #--------------------------------------------------------------------------------------------------------------------------
 # TurnPlayerDecider Function
@@ -154,6 +150,11 @@ computerT1:
 #--------------------------------------------------------------------------------------------------------------------------
 # gameStart Function
 gameStart:
+	# tracking turnNumber
+	lw $t0, turnNumber
+	addi $t0, $t0, 1
+	sw $t0, turnNumber
+	
 	# depending on value of currentTurnPlayer, it will go to player1Turn or player2Turn
 	lw $t0, currentTurnPlayer
 	beq $t0, 1, player1Turn
@@ -170,7 +171,6 @@ player1Turn:
 	
 	sw $v0, xCoord
 	
-	
 	li $v0, 4
 	la $a0, player1TurnPrompt2
 	syscall
@@ -184,13 +184,75 @@ player1Turn:
 	la $a0, player1TurnPrompt3
 	syscall
 	
-	li $v0, 8	
-	la $a0, cardinalDirection
-	li $a1, 20			# allocate byte space for string
-	move $t0, $a0
-	sw $t0, cardinalDirection	# store string into cardinalDirection
+	li $v0, 12
 	syscall
 	
+	# char to int
+	lbu $t1, nChar
+	lbu $t2, sChar
+	lbu $t3, eChar
+	lbu $t4, wChar
+	beq $v0, $t1, setNChar
+	beq $v0, $t2, setSChar
+	beq $v0, $t3, setEChar
+	beq $v0, $t4, setWChar
+	
+	j player1TurnEnd
+	
+setNChar:
+	#sb $t1, cardinalDirection 
+  	#lbu $a0, cardinalDirection	# making sure it works
+  	#li $v0, 11
+  	# set $t1 to 0, and stores it in cardinal Direction
+	addi $t1, $zero, 0
+  	sw $t1, cardinalDirection
+  	
+  	# making sure it works
+  	li $v0, 1
+  	lw $a0, cardinalDirection
+  	syscall
+  	
+	j player1TurnEnd
+setEChar:
+	# set $t1 to 1, and stores it in cardinal Direction
+	addi $t1, $zero, 1
+  	sw $t1, cardinalDirection
+  	
+  	# making sure it works
+  	li $v0, 1
+  	lw $a0, cardinalDirection
+  	syscall
+  	
+	j player1TurnEnd
+
+setSChar:
+	# set $t1 to 2, and stores it in cardinal Direction
+	addi $t1, $zero, 2
+  	sw $t1, cardinalDirection
+  	
+  	# making sure it works
+  	li $v0, 1
+  	lw $a0, cardinalDirection
+  	syscall
+  	
+	j player1TurnEnd
+
+setWChar:
+	# set $t1 to 3, and stores it in cardinal Direction
+	addi $t1, $zero, 3
+  	sw $t1, cardinalDirection
+  	
+  	# making sure it works
+  	li $v0, 1
+  	lw $a0, cardinalDirection
+  	syscall
+  	
+	j player1TurnEnd
+	
+	
+	
+	
+player1TurnEnd:
 	# lineAdding jal section
 	addiu $sp, $sp, -4	# allocate space in stack
 	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
@@ -213,9 +275,19 @@ player1Turn:
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
 	
-	lw $t0, currentTurnPlayer	# loads currentTurnPlayer
-	addi $t0, $t0, -1	
-	sw $t0, currentTurnPlayer	# sets currentTurnPlayer to P1
+	
+	# BoxCounter jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	lw $a0, turnNumber
+	jal BoxCounter
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	bge $v0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
+				# (which changes the turn order) and lets player take another turn
 	
 	# turnPlayerPrompt jal section
 	lw $t0, currentTurnPlayer	# loads currentTurnPlayer
@@ -230,9 +302,14 @@ player1Turn:
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
 	
+
 	j gameStart
 	
-	
+newTurn: 
+	li $v0, 4
+	la $a0, boxes
+	syscall
+	j gameStart	
 	
 
 player2Turn:
@@ -273,10 +350,10 @@ player2Turn:
    	li $v0, 42  #generates the random number.
     	syscall
     	
-    	# depending on RNG, chooses N/S/E/W
+    	# depending on RNG, chooses N/E/S/W
     	beq $a0, 0, N
-    	beq $a0, 1, S
-    	beq $a0, 2, E
+    	beq $a0, 1, E
+    	beq $a0, 2, S
     	beq $a0, 3, W
     	
 player2TurnEnd:
@@ -291,8 +368,6 @@ player2TurnEnd:
     	lbu $a0, newLineCharacter
   	li $v0, 11
   	syscall
-  	
-	
 	
 	# lineAdding jal section
 	addiu $sp, $sp, -4	# allocate space in stack
@@ -316,11 +391,24 @@ player2TurnEnd:
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
 	
+	# BoxCounter jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	lw $a0, turnNumber
+	jal BoxCounter
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	bge $v0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
+				# (which changes the turn order) and lets player take another turn
+	
+	# turnPlayerPrompt jal section
 	lw $t0, currentTurnPlayer	# loads currentTurnPlayer
 	addi $t0, $t0, -1	
 	sw $t0, currentTurnPlayer	# sets currentTurnPlayer to P1
 	
-	# turnPlayerPrompt jal section
 	addiu $sp, $sp, -4	# allocate space in stack
 	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
 	
@@ -328,22 +416,33 @@ player2TurnEnd:
 	
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	# BoxCounter jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	jal BoxCounter
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	
 
 	j gameStart
     	
-    	
-N:
-	lbu $a0, nChar
-  	li $v0, 11
-  	syscall
-  	j player2TurnEnd
-S:
-	lbu $a0, sChar
+# depending on number is what is outputted (does not affect calculations, it's for the player to read)
+N:	
+	lbu $a0, nChar	
   	li $v0, 11
   	syscall
   	j player2TurnEnd
 E:
 	lbu $a0, eChar
+  	li $v0, 11
+  	syscall
+  	j player2TurnEnd
+S:
+	lbu $a0, sChar
   	li $v0, 11
   	syscall
   	j player2TurnEnd
@@ -353,7 +452,6 @@ W:
   	syscall
   	j player2TurnEnd
   	
-
 #--------------------------------------------------------------------------------------------------------------------------
 # turnPlayerPrompt Method
 turnPlayerPrompt:
@@ -387,3 +485,4 @@ p2Prompt:
 	syscall
 	
 	j turnPlayerPromptEnd
+
