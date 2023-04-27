@@ -16,17 +16,19 @@ lineAdding:
 	beq $t2, 1, westDir	# branch if direction is west (now east)
 	addi $t1, $t1, 1	# if south. increment y by one
 	j postDirUpdate
-westDir: addi $t0, $t0, 1	# if west, increment x by one
+westDir: addi $t0, $t0, -1	# if west, decrement x by one
 	
 postDirUpdate:
 
 	# branch if x < 0 or x > 7 or y < 0 or y > 5
-	blt $t0, 1, xTooSmallError
+	blt $t0, 0, xTooSmallError
 	bgt $t0, 7, xTooBigError
-	blt $t1, 1, yTooSmallError
+	blt $t1, 0, yTooSmallError
 	bgt $t1, 5, yTooBigError
 	
 	beq $t2, 1, eastLineAdd
+	
+	beq $t1, 0, yTooSmallError # branch if y == 0, error
 	
 	# adding a north line
 	# t3 is index = (y-1)*8 + x
@@ -42,7 +44,10 @@ postDirUpdate:
 	li $v0, 0
 	jr $ra
 	
+	
 eastLineAdd:
+	beq $t0, 7, xTooBigError # if x == 7, error
+
 	# adding an east line
 	# t3 is index = y*7 + x
 	mul $t3, $t1, 7

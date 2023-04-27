@@ -197,6 +197,8 @@ player1Turn:
 	beq $v0, $t3, setEChar
 	beq $v0, $t4, setWChar
 	
+	# TODO: Add error here if input is not any of NESW
+	
 	j player1TurnEnd
 	
 setNChar:
@@ -266,16 +268,6 @@ player1TurnEnd:
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
 	
-	# printBoard jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	
-	jal printBoard
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
-	
 	# BoxCounter jal section
 	addiu $sp, $sp, -4	# allocate space in stack
 	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
@@ -286,7 +278,18 @@ player1TurnEnd:
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
 	
-	bge $v0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
+	move $s0, $v0	# save return value of boxCounter into s0
+	
+	# printBoard jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	jal printBoard
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	bge $s0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
 				# (which changes the turn order) and lets player take another turn
 	
 	# turnPlayerPrompt jal section
@@ -382,15 +385,6 @@ player2TurnEnd:
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
 	
-	# printBoard jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	
-	jal printBoard
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
 	# BoxCounter jal section
 	addiu $sp, $sp, -4	# allocate space in stack
 	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
@@ -400,8 +394,20 @@ player2TurnEnd:
 	
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
+	move $s0, $v0
 	
-	bge $v0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
+	# printBoard jal section
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
+	
+	jal printBoard
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	
+	
+	bge $s0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
 				# (which changes the turn order) and lets player take another turn
 	
 	# turnPlayerPrompt jal section

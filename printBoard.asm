@@ -90,13 +90,15 @@ printSpace: lbu $a0, spaceCharacter	# else block: print a space character in pla
 continue2:
 	lbu $a0, spaceCharacter # print 3 space characters to fill in empty cell
 	syscall
-	sll $t2, $t0, 3
-	sub $t2, $t2, $t0  # multiply t0 by 7 by multiplying by 8 and subtracting 1
+	mul $t2, $t0, 7 # multiply t0 by 7
 	add $t2, $t2, $t1  # add t1 to t2 to get final index
 	lbu $t3, boxArray($t2)  # load the state of current box into register t3
 	beq $t3, 0, Else   # check if box has been captured
-	addi $a0, $t3, 48  # print out player that captured box
+	li $v0, 1
+	move $a0, $t3 # print out player that completed box
 	syscall
+	
+	li $v0, 11
 	lbu $a0, spaceCharacter  # change back to space for last space
 	j End
 	Else: syscall
@@ -112,8 +114,6 @@ vertLoopEnd: move $t1, $zero	# reset the column counter
 	syscall
 	bne $t0, 6, horizontalPrintLoop	# if row does not = 6, repeat the loop
 	
-	#li $v0, 10	# exit program (temporary) | commented out to make main.asm work -Justin
-	#syscall
 	jr $ra		# needed to put here in order to interact with main.asm -also Justin
 	
 .data	
