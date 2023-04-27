@@ -59,6 +59,7 @@ columnLoop:
 	
 	beq $v0, 2, outerLoopEnd	# if v0 is set to 2, maximum number of new boxes have been completed, no need to keep searching
 
+Continue:
 	addi $t1, $t1, 1	# increment j
 	j columnLoop
 	

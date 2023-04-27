@@ -272,7 +272,7 @@ player1TurnEnd:
 	addiu $sp, $sp, -4	# allocate space in stack
 	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
 	
-	lw $a0, turnNumber
+	lw $a0, currentTurnPlayer
 	jal BoxCounter
 	
 	lw $ra, 0($sp)		# pop value off stack
@@ -389,7 +389,7 @@ player2TurnEnd:
 	addiu $sp, $sp, -4	# allocate space in stack
 	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
 	
-	lw $a0, turnNumber
+	lw $a0, currentTurnPlayer
 	jal BoxCounter
 	
 	lw $ra, 0($sp)		# pop value off stack
