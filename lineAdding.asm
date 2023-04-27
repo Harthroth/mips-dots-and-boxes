@@ -85,9 +85,8 @@ InputErrorPrint:
 	li $v0, 4
 	syscall
 	
-	#addiu $sp, $sp, -4	# allocate space in stack
-	#sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	j gameStart
+	li $v0, 1
+	jr $ra
 	
 	
 .data	

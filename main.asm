@@ -25,7 +25,10 @@
 	
 	boxes:			.asciiz "A box has been created, player goes again\n"
 	
-	turnNumber:		.word 0
+	gameOverString:		.asciiz "Game is over!"
+	player1WonString:		.asciiz "Player 1 won the game! Congratulations!\n"
+	player2WonString:		.asciiz "Player 2 (Computer) won the game! Better luck next time!\n"
+	tiedGameString:		.asciiz "The game is a tie!\n"
 
 	newLineCharacter: 	.byte '\n'
 	nChar: 	.byte 'N'
@@ -57,7 +60,33 @@ main:
 	
 	jal gameStart
 	
+gameOver:
+	li $v0, 4
+	la $a0, gameOverString
+	syscall
 	
+	la $t0, score
+	lbu $t1, 0($t0)	# player 1 score
+	lbu $t2, 1($t0)	# player 2 score
+	
+	beq $t1, $t2, tiedGame
+	bgt $t1, $t2, player1Won
+	
+	la $a0, player2WonString
+	syscall
+	j exitProgram
+	
+tiedGame:
+	la $a0, tiedGameString
+	syscall
+	j exitProgram
+
+player1Won:
+	la $a0, player1WonString
+	syscall
+	j exitProgram
+	
+exitProgram:
 	li $v0, 10
 	syscall
 	
@@ -145,11 +174,34 @@ computerT1:
 #--------------------------------------------------------------------------------------------------------------------------
 # gameStart Function
 gameStart:
-	# tracking turnNumber
-	lw $t0, turnNumber
-	addi $t0, $t0, 1
-	sw $t0, turnNumber
+	addiu $sp, $sp, -4	# allocate space in stack
+	sw $ra, 0($sp)		# loads saved $ra to first word on stack
 	
+	jal checkGameOver	# check if game is over
+	
+	lw $ra, 0($sp)		# pop value off stack
+	addiu $sp, $sp, 4	# deallocate space in stack
+	
+	beq $v0, 0, gameOver	# if v0 == 0, game is over
+	j ContinueGame
+	
+checkGameOver:
+	move $t0, $zero
+	
+gameOverCheckLoop:
+	lbu $t1, boxArray($t0)
+	beq $t1, 0, emptyBoxFound
+	addi $t0, $t0, 1
+	bne $t0, 48, gameOverCheckLoop
+	# no empty box found
+	move $v0, $zero
+	jr $ra
+	
+emptyBoxFound:
+	li $v0, 1
+	jr $ra
+	
+ContinueGame:
 	# depending on value of currentTurnPlayer, it will go to player1Turn or player2Turn
 	lw $t0, currentTurnPlayer
 	beq $t0, 1, player1Turn
@@ -242,6 +294,7 @@ player1TurnEnd:
 	lw $a2, cardinalDirection
 	lw $a3, currentTurnPlayer
 	jal lineAdding
+	beq $v0, 1, gameStart # if v0 is 1, line was not successfully added due to error so try again
 	
 	# BoxCounter jal section
 	
@@ -249,6 +302,11 @@ player1TurnEnd:
 	jal BoxCounter
 	
 	move $s0, $v0	# save return value of boxCounter into s0
+	
+	la $t0, score	# update player 1 score
+	lbu $t1, 0($t0)
+	add $t1, $t1, $s0
+	sb $t1, 0($t0)
 	
 	# printBoard jal section
 	
@@ -342,12 +400,17 @@ player2TurnEnd:
 	lw $a2, cardinalDirection
 	lw $a3, currentTurnPlayer
 	jal lineAdding
+	beq $v0, 1, gameStart # if v0 is 1, line was not successfully added due to error so try again
 	
 	# BoxCounter jal section
-	
 	lw $a0, currentTurnPlayer
 	jal BoxCounter
 	move $s0, $v0
+	
+	la $t0, score	# update player 2 score
+	lbu $t1, 1($t0)
+	add $t1, $t1, $s0
+	sb $t1, 1($t0)
 	
 	# printBoard jal section
 	jal printBoard
