@@ -57,10 +57,8 @@ columnLoop:
 	sb $a0, boxArray($t3)
 	addi $v0, $v0, 1 # increment return value v0 by 1 to indicate that player completed a box
 	
-	bne $v0, 2, Continue
-	jr $ra	# if v0 is set to 2, maximum number of new boxes have been completed, no need to keep searching
-	
-Continue:
+	beq $v0, 2, outerLoopEnd	# if v0 is set to 2, maximum number of new boxes have been completed, no need to keep searching
+
 	addi $t1, $t1, 1	# increment j
 	j columnLoop
 	
