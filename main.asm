@@ -1,7 +1,7 @@
 .data
-	horizontalLineArray: .space 42	# 42 bytes for a 8 * 7 array
-	verticalLineArray: .space 40	# 40 bytes for an 9 * 6 array
-	boxArray: .space 35             # 35 bytes for a 8 * 6 array
+	horizontalLineArray: .space 56  # 56 bytes for a 8 * 7 array
+	verticalLineArray: .space 54	# 54 bytes for an 9 * 6 array
+	boxArray: .space 48             # 48 bytes for a 8 * 6 array
 	score: .space 2                 # 2 bytes for the scores of both players
 
 	whoIsFirst:	.asciiz "Who is going first (1 = Player | 2 = Computer)\n"
@@ -11,8 +11,8 @@
 	initialText2:	.asciiz " will be going first\n"
 	ifP2:		.asciiz	" (Computer)"
 	
-	player1TurnPrompt1:	.asciiz "Input the X coordinate (0-7)\n"
-	player1TurnPrompt2:	.asciiz "\nInput the Y coordinate (0-5)\n"
+	player1TurnPrompt1:	.asciiz "Input the X coordinate (0-8)\n"
+	player1TurnPrompt2:	.asciiz "\nInput the Y coordinate (0-6)\n"
 	player1TurnPrompt3:	.asciiz "\nInput the Cardinal Direction (N/S/E/W)\n"
 	
 	turnPlayerPrompt1:	.asciiz "\nIt is now Player "
