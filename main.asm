@@ -97,16 +97,10 @@ turnPlayerDeciderEnd:
 #--------------------------------------------------------------------------------------------------------------------------
 # printBoard Function
 printBoard:
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-		
+	move $s1, $ra	# save return address into $s0
 	# prints the board from printBoard.asm
 	jal start
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
-	jr $ra			# returns to main
+	jr $s1			# returns to main
 	
 	
 #--------------------------------------------------------------------------------------------------------------------------
@@ -265,29 +259,16 @@ player1TurnEnd:
 	lw $a3, currentTurnPlayer
 	jal lineAdding
 	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
 	# BoxCounter jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
 	
 	lw $a0, currentTurnPlayer
 	jal BoxCounter
 	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
 	move $s0, $v0	# save return value of boxCounter into s0
 	
 	# printBoard jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
 	
 	jal printBoard
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
 	
 	bge $s0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
 				# (which changes the turn order) and lets player take another turn
@@ -297,14 +278,10 @@ player1TurnEnd:
 	addi $t0, $t0, 1
 	sw $t0, currentTurnPlayer	# sets currentTurnPlayer to P2
 	
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	
 	jal turnPlayerPrompt
 	
 	lw $ra, 0($sp)		# pop value off stack
 	addiu $sp, $sp, 4	# deallocate space in stack
-	
 
 	j gameStart
 	
@@ -382,30 +359,14 @@ player2TurnEnd:
 	lw $a3, currentTurnPlayer
 	jal lineAdding
 	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
 	# BoxCounter jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
 	
 	lw $a0, currentTurnPlayer
 	jal BoxCounter
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
 	move $s0, $v0
 	
 	# printBoard jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	
 	jal printBoard
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
-	
 	
 	bge $s0, 1, newTurn	# if a box has been made, then skips turnPlayerPrompt
 				# (which changes the turn order) and lets player take another turn
@@ -415,24 +376,7 @@ player2TurnEnd:
 	addi $t0, $t0, -1	
 	sw $t0, currentTurnPlayer	# sets currentTurnPlayer to P1
 	
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	
 	jal turnPlayerPrompt
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
-	# BoxCounter jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	
-	jal BoxCounter
-	
-	lw $ra, 0($sp)		# pop value off stack
-	addiu $sp, $sp, 4	# deallocate space in stack
-	
-	
 
 	j gameStart
     	

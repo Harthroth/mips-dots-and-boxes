@@ -20,20 +20,20 @@ westDir: addi $t0, $t0, -1	# if west, decrement x by one
 	
 postDirUpdate:
 
-	# branch if x < 0 or x > 7 or y < 0 or y > 5
+	# branch if x < 0 or x > 8 or y < 0 or y > 6
 	blt $t0, 0, xTooSmallError
-	bgt $t0, 7, xTooBigError
+	bgt $t0, 8, xTooBigError
 	blt $t1, 0, yTooSmallError
-	bgt $t1, 5, yTooBigError
+	bgt $t1, 6, yTooBigError
 	
 	beq $t2, 1, eastLineAdd
 	
 	beq $t1, 0, yTooSmallError # branch if y == 0, error
 	
 	# adding a north line
-	# t3 is index = (y-1)*8 + x
+	# t3 is index = (y-1)*9 + x
 	addi $t3, $t1, -1
-	sll $t3, $t3, 3
+	mul $t3, $t3, 9
 	add $t3, $t3, $t0
 	lbu $t4, verticalLineArray($t3)
 	bne $t4, 0, lineExistsError	# if line exists, throw error
@@ -46,11 +46,11 @@ postDirUpdate:
 	
 	
 eastLineAdd:
-	beq $t0, 7, xTooBigError # if x == 7, error
+	beq $t0, 8, xTooBigError # if x == 8, error
 
 	# adding an east line
-	# t3 is index = y*7 + x
-	mul $t3, $t1, 7
+	# t3 is index = y*8 + x
+	sll $t3, $t1, 3
 	add $t3, $t3, $t0
 	lbu $t4, horizontalLineArray($t3)
 	bne $t4, 0, lineExistsError	# if line exists, throw error
