@@ -1,7 +1,7 @@
 .data
-	horizontalLineArray: .space 42	# 42 bytes for a 7 * 6 array
-	verticalLineArray: .space 40	# 40 bytes for an 8 * 5 array
-	boxArray: .space 35             # 35 bytes for a 7 * 5 array
+	horizontalLineArray: .space 42	# 42 bytes for a 8 * 7 array
+	verticalLineArray: .space 40	# 40 bytes for an 9 * 6 array
+	boxArray: .space 35             # 35 bytes for a 8 * 6 array
 	score: .space 2                 # 2 bytes for the scores of both players
 
 	whoIsFirst:	.asciiz "Who is going first (1 = Player | 2 = Computer)\n"
