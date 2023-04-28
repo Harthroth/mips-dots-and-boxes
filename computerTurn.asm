@@ -100,7 +100,7 @@ generateRandom:
 	
 	move $t0, $zero
 	verticalLoop:
-	beq $t0, 56, verticalEnd
+	beq $t0, 54, verticalEnd
 	lbu $t2, verticalLineArray($t0)	#load side into t2
 	
 	# add 1-side to add 1 when side is 0
