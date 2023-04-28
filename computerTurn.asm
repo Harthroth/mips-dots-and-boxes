@@ -1,3 +1,5 @@
+# Subroutine for making computer moves
+
 .globl computerTurn
 
 .text
