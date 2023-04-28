@@ -151,4 +151,3 @@ vertLoopEnd: move $t1, $zero	# reset the column counter
 	newLineCharacter: .byte '\n'
 	player1: .asciiz "\nPlayer 1 score: "
 	player2: .asciiz "\nPlayer 2 score: "
-	

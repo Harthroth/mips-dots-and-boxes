@@ -50,6 +50,8 @@
 .globl boxArray
 .globl score
 .globl gameStart
+.globl xCoord
+.globl yCoord
 
 ##--------------------------------------------------------------------------------------------------------------------------
 .text
@@ -335,73 +337,10 @@ newTurn:
 	
 
 player2Turn:
-	# random number generator for 1st value
-	li $a1, 9  #Here you set $a1 to the max bound.
-   	li $v0, 42  #generates the random number.
-    	syscall
-    	
-    	add $a0, $a0, 1  #Here you add the lowest bound
-   	li $v0, 1  #1 print integer
-  	syscall
-  	
-  	addi $a0, $a0, -1 # decrement random number to be 0-based indexing
-  	sw $a0, xCoord	# stores rng x-coord into xCoord
-  	
-  	# newLineChar
-  	lbu $a0, newLineCharacter
-  	li $v0, 11
-  	syscall
-  	
-  	# random number generator for 2nd value
-  	li $a1, 7  #Here you set $a1 to the max bound.
-   	li $v0, 42  #generates the random number.
-    	syscall
-    	
-    	add $a0, $a0, 1  #Here you add the lowest bound
-   	li $v0, 1  #1 print integer
-  	syscall
-  	
-  	addi $a0, $a0, -1 # decrement random number to be 0-based indexing
-  	sw $a0, yCoord	# stores rng x-coord into xCoord
-  	
-  	# newlineChar
-    	lbu $a0, newLineCharacter
-  	li $v0, 11
-  	syscall
-  	
-  	# random number generator for 3rd value (N/E/S/W)
-  	li $a1, 3  #Here you set $a1 to the max bound.
-   	li $v0, 42  #generates the random number.
-    	syscall
-    	
-    	# depending on RNG, chooses N/E/S/W
-    	move $s0, $a0
-    	beq $s0, 0, N
-    	beq $s0, 1, E
-    	beq $s0, 2, S
-    	beq $s0, 3, W
+	jal computerTurn
     	
 player2TurnEnd:
-	# stores cardinal direction in cardinalDirection
-	move $t0, $s0
-	sw $t0, cardinalDirection	# store direction into cardinalDirection
-	
-	# newlineChar
-    	lbu $a0, newLineCharacter
-  	li $v0, 11
-  	syscall
-	
-	# lineAdding jal section
-	addiu $sp, $sp, -4	# allocate space in stack
-	sw $ra, 0($sp)		# loads saved $ra to first cell(?) of stack
-	
-	lw $a0, xCoord
-	lw $a1, yCoord
-	lw $a2, cardinalDirection
-	lw $a3, currentTurnPlayer
-	jal lineAdding
-	beq $v0, 1, gameStart # if v0 is 1, line was not successfully added due to error so try again
-	
+
 	# BoxCounter jal section
 	lw $a0, currentTurnPlayer
 	jal BoxCounter
@@ -426,28 +365,6 @@ player2TurnEnd:
 	jal turnPlayerPrompt
 
 	j gameStart
-    	
-# depending on number is what is outputted (does not affect calculations, it's for the player to read)
-N:	
-	lbu $a0, nChar	
-  	li $v0, 11
-  	syscall
-  	j player2TurnEnd
-E:
-	lbu $a0, eChar
-  	li $v0, 11
-  	syscall
-  	j player2TurnEnd
-S:
-	lbu $a0, sChar
-  	li $v0, 11
-  	syscall
-  	j player2TurnEnd
-W:
-	lbu $a0, wChar
-  	li $v0, 11
-  	syscall
-  	j player2TurnEnd
   	
 #--------------------------------------------------------------------------------------------------------------------------
 # turnPlayerPrompt Method
@@ -482,4 +399,3 @@ p2Prompt:
 	syscall
 	
 	j turnPlayerPromptEnd
-

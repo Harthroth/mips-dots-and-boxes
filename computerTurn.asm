@@ -1,4 +1,3 @@
-
 .globl computerTurn
 
 .text
@@ -9,7 +8,7 @@ computerTurn:
 	move $v0, $zero # set v0 to zero, will be return value (number of boxes completed)
 	
 rowLoop: 
-	beq $t0, 6, outerLoopEnd	# while i < 6
+	beq $t0, 6, generateRandom	# while i < 6
 columnLoop:
 	beq $t1, 8, innerLoopEnd	# while i < 8
 
@@ -49,31 +48,28 @@ columnLoop:
 	
 	bne $t6, 3, Continue		# if there are not 3 sides in the box, continue
 	
-	# find line which is not filled, fill the line
+	li $t6, 1	# if there are 3 sides in the box, set $t6 to 1 to fill later
+	
+	# fill all 4 lines, only adds 1 since 3 are filled already
 	# t3 = 8*t0 + t1
 	sll $t3, $t0, 3
 	add $t3, $t3, $t1
-	lbu $t4, horizontalLineArray($t3)	# top line must exist
-	bne $t4, 0, return	# if horiArr[i*8 + j] != 1, branch
-	
+	sb $t6, horizontalLineArray($t3)
+		
 	# t3 = 8*(t0+1) + t1
 	addi $t3, $t3, 8
-	lbu $t4, horizontalLineArray($t3)	# bottom line must exist
-	bne $t4, 1, return	# if horiArr[(i+1)*8 + j] != 1, branch
+	sb $t6, horizontalLineArray($t3)	
 	
 	# t3 = 9*t0 + t1
 	mul $t3, $t0, 9
 	add $t3, $t3, $t1
-	lbu $t4, verticalLineArray($t3)	# left line must exist
-	bne $t4, 1, return	# if vertArr[i*9 + j] != 1, branch
+	sb $t6, verticalLineArray($t3)
 	
 	# t3 = 9*t0 + t1 + 1
 	addi $t3, $t3, 1
-	lbu $t4, verticalLineArray($t3)	# right line must exist
-	bne $t4, 1, return	# if vertArr[i*9 + j + 1] != 1, branch
+	sb $t6, verticalLineArray($t3)	
 	
-	return:
-	
+	jr $ra	#done, return to use box checker
 
 Continue:
 	addi $t1, $t1, 1	# increment j
@@ -81,62 +77,78 @@ Continue:
 	
 innerLoopEnd:
 	addi $t0, $t0, 1	# increment i
-	move $t1, $zero	# reset j
+	move $t1, $zero		# reset j
 	j rowLoop
-
-outerLoopEnd:
-	j generateRandom
-
 
 # generate a random value if there is no box to complete
 generateRandom:	
-# random number generator for 1st value
-        li $a1, 9  #Here you set $a1 to the max bound.
+	# find number of non-filled sides
+	move $t0, $zero
+	move $t1, $zero
+	horizontalLoop:
+	beq $t0, 56, horizontalEnd
+	lbu $t2, horizontalLineArray($t0)	#load side into t2
+	
+	# add 1-side to add 1 when side is 0
+	addi $t1, $t1, 1
+	sub $t1, $t1, $t2
+	
+	addi $t0, $t0, 1
+	j horizontalLoop
+	
+	horizontalEnd:
+	
+	move $t0, $zero
+	verticalLoop:
+	beq $t0, 56, verticalEnd
+	lbu $t2, verticalLineArray($t0)	#load side into t2
+	
+	# add 1-side to add 1 when side is 0
+	addi $t1, $t1, 1
+	sub $t1, $t1, $t2
+	
+	addi $t0, $t0, 1
+	j verticalLoop
+	
+	verticalEnd:
+	move $a1, $t1  #Here you set $a1 to the max bound.
    	li $v0, 42  #generates the random number.
     	syscall
     	
-    	addi $a0, $a0, 1  #Here you add the lowest bound
-   	li $v0, 1  #1 print integer
-  	syscall
+  	move $t0, $zero
+	move $t1, $a0	# move picked index into $t1
+	horizontalFindLoop:
+	beq $t0, 56, horizontalEnd
+	lbu $t2, horizontalLineArray($t0)	#load side into t2
+	
+	# subtract 1-side to subtract 1 when side is 0
+	addi $t1, $t1, -1
+	add $t1, $t1, $t2
+	
+	addi $t0, $t0, 1
+	
+	bne $t1, 0, horizontalFindLoop		# loop if index not reached
+	li $t2, 1
+	sb $t2, horizontalLineArray($t0)	#set side to 1
+	jr $ra 	# return
+	
+	horizontalFindEnd:
+	
+	move $t0, $zero
+	verticalFindLoop:	#don't need end condition, index must be here 
+	lbu $t2, verticalLineArray($t0)	#load side into t2
+	
+	# subtract 1-side to subtract 1 when side is 0
+	addi $t1, $t1, -1
+	add $t1, $t1, $t2
+	
+	bne $t1, 0, verticalFindLoop	# loop if index not reached
+	li $t2, 1
+	sb $t2, verticalLineArray($t0)	#set side to 1
+	jr $ra 	# return
+	
   	
-  	addi $a0, $a0, -1 # decrement random number to be 0-based indexing
-  	sw $a0, xCoord	# stores rng x-coord into xCoord
-  	
-  	# newLineChar
-  	lbu $a0, newLineCharacter
-  	li $v0, 11
-  	syscall
-  	
-  	# random number generator for 2nd value
-  	li $a1, 7  #Here you set $a1 to the max bound.
-   	li $v0, 42  #generates the random number.
-    	syscall
     	
-    	add $a0, $a0, 1  #Here you add the lowest bound
-   	li $v0, 1  #1 print integer
-  	syscall
-  	
-  	addi $a0, $a0, -1 # decrement random number to be 0-based indexing
-  	sw $a0, yCoord	# stores rng x-coord into xCoord
-  	
-  	# newlineChar
-    	lbu $a0, newLineCharacter
-  	li $v0, 11
-  	syscall
-  	
-  	# random number generator for 3rd value (N/E/S/W)
-  	li $a1, 3  #Here you set $a1 to the max bound.
-   	li $v0, 42  #generates the random number.
-    	syscall
-    	
-    	# depending on RNG, chooses N/E/S/W
-    	move $s0, $a0
-    	beq $s0, 0, N
-    	beq $s0, 1, E
-    	beq $s0, 2, S
-    	beq $s0, 3, W
-	
-	j $ra	#return
-	
-	
 
+	
+	
