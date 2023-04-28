@@ -118,7 +118,7 @@ generateRandom:
   	move $t0, $zero
 	move $t1, $a0	# move picked index into $t1
 	horizontalFindLoop:
-	beq $t0, 56, horizontalEnd
+	beq $t0, 56, horizontalFindEnd
 	lbu $t2, horizontalLineArray($t0)	#load side into t2
 	
 	# subtract 1-side to subtract 1 when side is 0
