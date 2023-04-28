@@ -115,17 +115,16 @@ generateRandom:
    	li $v0, 42  #generates the random number.
     	syscall
     	
-  	move $t0, $zero
+  	li $t0, -1
 	move $t1, $a0	# move picked index into $t1
 	horizontalFindLoop:
+	addi $t0, $t0, 1
 	beq $t0, 56, horizontalFindEnd
 	lbu $t2, horizontalLineArray($t0)	#load side into t2
 	
 	# subtract 1-side to subtract 1 when side is 0
 	addi $t1, $t1, -1
 	add $t1, $t1, $t2
-	
-	addi $t0, $t0, 1
 	
 	bne $t1, 0, horizontalFindLoop		# loop if index not reached
 	li $t2, 1
@@ -134,8 +133,9 @@ generateRandom:
 	
 	horizontalFindEnd:
 	
-	move $t0, $zero
+	li $t0, -1
 	verticalFindLoop:	#don't need end condition, index must be here 
+	addi $t0, $t0, 1
 	lbu $t2, verticalLineArray($t0)	#load side into t2
 	
 	# subtract 1-side to subtract 1 when side is 0
